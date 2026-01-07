@@ -21,7 +21,7 @@
             --start-pos: 160px; 
             
             /* 动态变量 */
-            --car-size: 6.0rem; /* CSS初始值也同步改大 */
+            --car-size: 6.0rem; /* 保持加大后的尺寸 */
             --lane-margin: 8px;
             --label-scale: 1;
             
@@ -130,25 +130,26 @@
             width: auto;             /* 保持比例 */
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
             
-            /* 上下摆动动画 */
-            animation: carBounce 0.6s infinite ease-in-out alternate; 
+            /* 底部中心旋转，左右摇摆 */
+            transform-origin: bottom center; 
+            animation: heroSway 1s infinite ease-in-out alternate; 
             
             margin-left: -5px; 
             transition: height 0.3s;
             display: block;
         }
 
-        /* 恢复：上下颠簸动画 */
-        @keyframes carBounce { 
-            from { transform: translateY(0); } 
-            to { transform: translateY(-5px); } 
+        /* 左右摇摆动画 */
+        @keyframes heroSway { 
+            from { transform: rotate(-8deg); } 
+            to { transform: rotate(8deg); } 
         }
 
-        /* 激活（冲刺）状态：放大并向前 */
+        /* 激活（冲刺）状态：身体前倾，加速 */
         .car-wrapper:active .car { 
             animation: none; 
-            transform: scale(1.15) translateX(5px); 
-            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3));
+            transform: rotate(20deg) scale(1.1); /* 向右前倾 */
+            transition: all 0.1s; 
         }
         
         .car-wrapper:active .group-label { transform: translateY(-50%) scale(0.9); transition: 0.1s; }
@@ -268,6 +269,7 @@
             const groupsStr = document.getElementById('groupsInput').value;
             let inputSteps = parseInt(document.getElementById('stepsInput').value);
             if (inputSteps < 1) inputSteps = 1;
+            // 修改：上限恢复为 99
             if (inputSteps > 99) inputSteps = 99;
             totalSteps = inputSteps;
 
@@ -280,13 +282,12 @@
             const teamCount = names.length;
             
             // 自适应逻辑
-            // 修改：基础大小改为 6.0rem (原4.5rem增加30%以上)
+            // 保持加大后的尺寸 (6.0rem)
             let newCarSize = 6.0; 
             let newMargin = 8;
             let newLabelScale = 1;
             
             if (teamCount > 6) {
-                // 修改：基数改为6.0，最小值也稍微调大到 2.0
                 newCarSize = Math.max(2.0, 6.0 - (teamCount - 6) * 0.25); 
                 newMargin = Math.max(1, 8 - (teamCount - 6) * 0.6); 
                 newLabelScale = Math.max(0.6, 1 - (teamCount - 6) * 0.03); 
@@ -308,14 +309,13 @@
             document.documentElement.style.setProperty('--score-font', `${newScoreFont}px`);
 
             groups = names.map((name, index) => {
-                // 计算图片路径：1-9 循环使用
                 const imgIndex = (index % 9) + 1;
                 return {
                     id: index,
                     name: name,
                     currentStep: 0, 
                     bonusAwarded: 0, 
-                    image: `/assets/mw/${imgIndex}.png` // 设置图片路径
+                    image: `/assets/mw/${imgIndex}.png` 
                 };
             });
 
@@ -341,7 +341,6 @@
                 label.className = 'group-label';
                 label.textContent = g.name;
 
-                // 创建 img 标签
                 const car = document.createElement('img');
                 car.className = 'car';
                 car.src = g.image;
