@@ -218,7 +218,7 @@
                 </div>
                 <div class="input-group">
                     <label>小组名单（小组间用","隔开）</label>
-                    <input type="text" id="groupsInput" value="雷霆, 飞鹰, 猛虎, 梦之队, 快乐星球, 银河, 必胜, 冲锋, 极速, 猎豹">
+                    <input type="text" id="groupsInput" value="雷霆, 飞鹰, 猛虎, 梦之队, 快乐星球, 银河, 必胜, 冲锋, 极速">
                 </div>
                 <button class="btn-reset" onclick="resetRace()">🔄 重置 / 开始比赛</button>
                 <div class="tip-text">💡 提示：左键点击角色前进，右键点击回退</div>
@@ -269,7 +269,6 @@
             const groupsStr = document.getElementById('groupsInput').value;
             let inputSteps = parseInt(document.getElementById('stepsInput').value);
             if (inputSteps < 1) inputSteps = 1;
-            // 修改：上限恢复为 99
             if (inputSteps > 99) inputSteps = 99;
             totalSteps = inputSteps;
 
