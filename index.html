@@ -21,7 +21,7 @@
             --start-pos: 160px; 
             
             /* 动态变量 */
-            --car-size: 4.5rem; 
+            --car-size: 6.0rem; /* CSS初始值也同步改大 */
             --lane-margin: 8px;
             --label-scale: 1;
             
@@ -130,28 +130,25 @@
             width: auto;             /* 保持比例 */
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
             
-            /* 关键修改：设置旋转中心为底部中心，模拟脚不动 */
-            transform-origin: bottom center; 
-            
-            /* 应用左右摇摆动画 */
-            animation: heroSway 1s infinite ease-in-out alternate; 
+            /* 上下摆动动画 */
+            animation: carBounce 0.6s infinite ease-in-out alternate; 
             
             margin-left: -5px; 
             transition: height 0.3s;
             display: block;
         }
 
-        /* 新动画：左右摇摆 */
-        @keyframes heroSway { 
-            from { transform: rotate(-8deg); } 
-            to { transform: rotate(8deg); } 
+        /* 恢复：上下颠簸动画 */
+        @keyframes carBounce { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-5px); } 
         }
 
-        /* 激活（冲刺）状态：身体前倾，加速 */
+        /* 激活（冲刺）状态：放大并向前 */
         .car-wrapper:active .car { 
             animation: none; 
-            transform: rotate(20deg) scale(1.1); /* 向右前倾 */
-            transition: all 0.1s; 
+            transform: scale(1.15) translateX(5px); 
+            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3));
         }
         
         .car-wrapper:active .group-label { transform: translateY(-50%) scale(0.9); transition: 0.1s; }
@@ -251,8 +248,6 @@
         let isRaceActive = true;
         let scoreHistory = {}; 
         
-        // 旧的 Emoji 数组已移除，现在逻辑是直接拼文件名
-
         const START_OFFSET = 160; 
 
         window.onload = function() {
@@ -285,11 +280,14 @@
             const teamCount = names.length;
             
             // 自适应逻辑
-            let newCarSize = 4.5;
+            // 修改：基础大小改为 6.0rem (原4.5rem增加30%以上)
+            let newCarSize = 6.0; 
             let newMargin = 8;
             let newLabelScale = 1;
+            
             if (teamCount > 6) {
-                newCarSize = Math.max(1.5, 4.5 - (teamCount - 6) * 0.25); 
+                // 修改：基数改为6.0，最小值也稍微调大到 2.0
+                newCarSize = Math.max(2.0, 6.0 - (teamCount - 6) * 0.25); 
                 newMargin = Math.max(1, 8 - (teamCount - 6) * 0.6); 
                 newLabelScale = Math.max(0.6, 1 - (teamCount - 6) * 0.03); 
             }
@@ -343,11 +341,11 @@
                 label.className = 'group-label';
                 label.textContent = g.name;
 
-                // 修改：创建 img 标签而不是 div
+                // 创建 img 标签
                 const car = document.createElement('img');
                 car.className = 'car';
                 car.src = g.image;
-                car.draggable = false; // 防止拖拽图片
+                car.draggable = false; 
 
                 carWrap.appendChild(label); 
                 carWrap.appendChild(car);   
@@ -469,5 +467,4 @@
         window.onresize = () => groups.forEach(g => updateCarPosition(g));
     </script>
 </body>
-
 </html>
