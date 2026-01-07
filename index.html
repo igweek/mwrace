@@ -219,7 +219,7 @@
                     <input type="number" id="stepsInput" value="5" min="1" max="99">
                 </div>
                 <div class="input-group">
-                    <label>小组名单</label>
+                    <label>小组名单（小组间用","隔开）</label>
                     <input type="text" id="groupsInput" value="雷霆, 飞鹰, 猛虎, 梦之队, 快乐星球, 银河, 必胜, 冲锋, 极速, 猎豹">
                 </div>
                 <button class="btn-reset" onclick="resetRace()">🔄 重置 / 开始比赛</button>
@@ -469,4 +469,5 @@
         window.onresize = () => groups.forEach(g => updateCarPosition(g));
     </script>
 </body>
+
 </html>
