@@ -174,7 +174,7 @@ h2 {
 }
 
 .backend-panel {
-    flex: 0 0 auto;
+    min-height: 0;
 }
 
 .class-panel,
@@ -186,11 +186,11 @@ h2 {
 }
 
 .class-panel {
-    flex: 1;
+    min-height: 0;
 }
 
 .group-panel {
-    flex: 1.08;
+    min-height: 0;
 }
 
 .guest-panel {
@@ -247,20 +247,46 @@ h2 {
     min-height: 0;
     display: grid;
     grid-template-columns: 320px minmax(260px, 1fr) minmax(280px, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: max-content max-content max-content;
+    grid-template-areas:
+        "account guest classes"
+        "groups groups classes"
+        "danger danger danger";
+    align-content: start;
     gap: 14px;
     padding: 14px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .settings-grid .panel {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
+}
+
+.backend-panel {
+    grid-area: account;
+}
+
+.guest-panel {
+    grid-area: guest;
+}
+
+.class-panel {
+    grid-area: classes;
+}
+
+.group-panel {
+    grid-area: groups;
 }
 
 .danger-panel {
-    grid-column: 1 / -1;
+    grid-area: danger;
+}
+
+.class-panel .list-stack,
+.group-panel .list-stack {
+    max-height: min(48vh, 460px);
 }
 
 .panel-heading {
@@ -923,6 +949,12 @@ textarea:focus {
 
     .settings-grid {
         grid-template-columns: 1fr;
+        grid-template-areas:
+            "account"
+            "guest"
+            "classes"
+            "groups"
+            "danger";
         overflow: auto;
     }
 }

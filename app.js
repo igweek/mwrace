@@ -988,14 +988,16 @@
         if (!progress || progress.currentStep <= 0) return;
 
         if (progress.currentStep === state.totalSteps) {
-            if (progress.committedPoints > 0) {
-                const rolledBack = await applyHistoricalDelta(groupId, -progress.committedPoints);
-                if (!rolledBack) return;
-                progress.committedPoints = 0;
+            const rolledBack = await rollbackCommittedRoundScores();
+            if (!rolledBack) return;
+            const winnerProgress = state.currentWinnerId ? state.raceProgress[state.currentWinnerId] : progress;
+            if (winnerProgress) {
+                winnerProgress.roundScore = Math.max(0, (Number(winnerProgress.roundScore) || 0) - (Number(winnerProgress.bonusAwarded) || 0));
+                winnerProgress.bonusAwarded = 0;
             }
-            progress.roundScore = Math.max(0, (Number(progress.roundScore) || 0) - (Number(progress.bonusAwarded) || 0));
-            progress.bonusAwarded = 0;
             state.isRaceActive = true;
+            state.currentWinnerId = null;
+            state.bonusPoints = 0;
             hideWinnerModal();
         }
 
@@ -1041,27 +1043,25 @@
     }
 
     async function collectBonus() {
-        if (state.currentWinnerId && state.bonusPoints > 0) {
-            const progress = state.raceProgress[state.currentWinnerId];
-            if (progress) {
-                const previousRoundScore = Number(progress.roundScore) || 0;
-                progress.bonusAwarded = state.bonusPoints;
-                progress.roundScore = Math.max(0, previousRoundScore) + state.bonusPoints;
-                const delta = Math.max(0, (Number(progress.roundScore) || 0) - (Number(progress.committedPoints) || 0));
-                if (delta > 0) {
-                    const committed = await applyHistoricalDelta(state.currentWinnerId, delta);
-                    if (!committed) {
-                        progress.roundScore = previousRoundScore;
-                        progress.bonusAwarded = 0;
-                        saveProgress();
-                        renderScoreboard();
-                        return;
-                    }
-                    progress.committedPoints = (Number(progress.committedPoints) || 0) + delta;
-                }
+        if (!state.currentWinnerId || state.bonusPoints <= 0) return;
+
+        const progress = state.raceProgress[state.currentWinnerId];
+        if (progress) {
+            const previousRoundScore = Number(progress.roundScore) || 0;
+            const previousBonus = Number(progress.bonusAwarded) || 0;
+            progress.bonusAwarded = state.bonusPoints;
+            progress.roundScore = Math.max(0, previousRoundScore) + state.bonusPoints;
+
+            const committed = await commitRoundScores();
+            if (!committed) {
+                progress.roundScore = previousRoundScore;
+                progress.bonusAwarded = previousBonus;
                 saveProgress();
                 renderScoreboard();
+                return;
             }
+            saveProgress();
+            renderScoreboard();
         }
         state.bonusPoints = 0;
         hideWinnerModal();
@@ -1074,6 +1074,68 @@
     function getRoundScore(groupId) {
         const progress = state.raceProgress[groupId];
         return progress ? Math.max(0, Number(progress.roundScore) || 0) : 0;
+    }
+
+    async function commitRoundScores() {
+        const deltas = state.groups
+            .map((group) => {
+                const progress = state.raceProgress[group.id];
+                if (!progress) return null;
+                const committedPoints = Math.max(0, Number(progress.committedPoints) || 0);
+                const delta = Math.max(0, getRoundScore(group.id) - committedPoints);
+                return delta > 0 ? { groupId: group.id, delta } : null;
+            })
+            .filter(Boolean);
+
+        const applied = [];
+        for (const item of deltas) {
+            const committed = await applyHistoricalDelta(item.groupId, item.delta);
+            if (!committed) {
+                for (const previous of applied.reverse()) {
+                    await applyHistoricalDelta(previous.groupId, -previous.delta);
+                    const previousProgress = state.raceProgress[previous.groupId];
+                    if (previousProgress) {
+                        previousProgress.committedPoints = Math.max(0, (Number(previousProgress.committedPoints) || 0) - previous.delta);
+                    }
+                }
+                toast("本轮积分未完整同步，已撤回本次提交。", "error");
+                return false;
+            }
+            const progress = state.raceProgress[item.groupId];
+            if (progress) progress.committedPoints = (Number(progress.committedPoints) || 0) + item.delta;
+            applied.push(item);
+        }
+
+        return true;
+    }
+
+    async function rollbackCommittedRoundScores() {
+        const committedItems = state.groups
+            .map((group) => {
+                const progress = state.raceProgress[group.id];
+                const points = progress ? Math.max(0, Number(progress.committedPoints) || 0) : 0;
+                return points > 0 ? { groupId: group.id, points } : null;
+            })
+            .filter(Boolean);
+
+        const rolledBack = [];
+        for (const item of committedItems) {
+            const reverted = await applyHistoricalDelta(item.groupId, -item.points);
+            if (!reverted) {
+                for (const previous of rolledBack.reverse()) {
+                    await applyHistoricalDelta(previous.groupId, previous.points);
+                    const previousProgress = state.raceProgress[previous.groupId];
+                    if (previousProgress) previousProgress.committedPoints = previous.points;
+                }
+                toast("终点回退未完整同步，历史总分保持不变。", "error");
+                return false;
+            }
+            const progress = state.raceProgress[item.groupId];
+            if (progress) progress.committedPoints = 0;
+            rolledBack.push(item);
+        }
+
+        return true;
     }
 
     async function applyHistoricalDelta(groupId, delta) {
