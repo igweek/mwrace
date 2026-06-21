@@ -106,100 +106,111 @@
             <div class="settings-header">
                 <div>
                     <p class="section-kicker">Settings</p>
-                    <h2 id="settingsTitle">账号与班级设置</h2>
+                    <h2 id="settingsTitle">设置</h2>
                 </div>
                 <button id="closeSettingsBtn" class="button ghost-button" type="button">关闭</button>
             </div>
 
             <div class="settings-grid">
-                <section class="panel backend-panel">
-                    <div class="panel-heading">
-                        <div>
-                            <p class="section-kicker">Account</p>
-                            <h2>账号登录</h2>
+                <div class="settings-column settings-side-column">
+                    <section class="panel backend-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-kicker">Account</p>
+                                <h2>账号</h2>
+                            </div>
+                            <span id="accountState" class="mini-state">游客模式</span>
                         </div>
-                        <span id="accountState" class="mini-state">游客模式</span>
+
+                        <p class="account-note">未登录也可以直接比赛；登录后才会保存班级、小组和历史总分。</p>
+
+                        <div class="auth-mode-tabs" role="tablist" aria-label="账号操作">
+                            <button id="authLoginModeBtn" class="auth-mode-button is-active" type="button" role="tab" aria-selected="true">登录</button>
+                            <button id="authRegisterModeBtn" class="auth-mode-button" type="button" role="tab" aria-selected="false">注册</button>
+                        </div>
+                        <p id="authModeHint" class="auth-hint">使用已有邮箱登录，继续管理你的班级和历史总分。</p>
+
+                        <div class="auth-grid">
+                            <div class="field-stack">
+                                <label for="authEmail">邮箱</label>
+                                <input id="authEmail" type="email" placeholder="teacher@example.com" autocomplete="username" spellcheck="false">
+                            </div>
+                            <div class="field-stack">
+                                <label for="authPassword">密码</label>
+                                <input id="authPassword" type="password" placeholder="不少于 6 位" autocomplete="current-password">
+                            </div>
+                            <div class="button-row">
+                                <button id="authSubmitBtn" class="button primary-button" type="button">登录</button>
+                                <button id="signOutBtn" class="button ghost-button" type="button">退出</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="panel guest-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-kicker">Guest Teams</p>
+                                <h2>游客模式</h2>
+                            </div>
+                        </div>
+
+                        <form id="guestTeamForm" class="guest-team-form">
+                            <div class="field-stack">
+                                <label for="guestTeamNamesInput">队伍名称</label>
+                                <textarea id="guestTeamNamesInput" rows="7" placeholder="每行一个队伍名&#10;例如：闪电队&#10;勇者队"></textarea>
+                            </div>
+                            <button class="button secondary-button wide-button" type="submit">应用游客队伍</button>
+                        </form>
+                    </section>
+                </div>
+
+                <div class="settings-column settings-main-column">
+                    <div class="settings-management-row">
+                        <section class="panel class-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="section-kicker">Classes</p>
+                                    <h2>班级</h2>
+                                </div>
+                                <span id="classCount" class="count-pill">0</span>
+                            </div>
+
+                            <form id="classForm" class="inline-form">
+                                <input id="classNameInput" type="text" maxlength="40" placeholder="例如：中华班" required>
+                                <button class="button primary-button square-button" type="submit">+</button>
+                            </form>
+
+                            <div id="classList" class="list-stack"></div>
+                        </section>
+
+                        <section class="panel group-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="section-kicker">Groups</p>
+                                    <h2>小组</h2>
+                                </div>
+                            </div>
+
+                            <form id="groupForm" class="inline-form">
+                                <input id="groupNameInput" type="text" maxlength="40" placeholder="例如：第一组" required>
+                                <button class="button primary-button square-button" type="submit">+</button>
+                            </form>
+
+                            <div id="groupList" class="list-stack"></div>
+                        </section>
                     </div>
 
-                    <p class="account-note">未登录也可以直接比赛；登录后才会保存班级、小组和历史总分。</p>
-
-                    <div class="auth-grid">
-                        <div class="field-stack">
-                            <label for="authEmail">邮箱</label>
-                            <input id="authEmail" type="email" placeholder="teacher@example.com" autocomplete="username">
+                    <section class="panel danger-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-kicker">Data</p>
+                                <h2>数据操作</h2>
+                            </div>
                         </div>
-                        <div class="field-stack">
-                            <label for="authPassword">密码</label>
-                            <input id="authPassword" type="password" placeholder="不少于 6 位" autocomplete="current-password">
-                        </div>
-                        <div class="button-row">
-                            <button id="signInBtn" class="button primary-button" type="button">登录</button>
-                            <button id="signUpBtn" class="button secondary-button" type="button">注册</button>
-                            <button id="signOutBtn" class="button ghost-button" type="button">退出</button>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="panel guest-panel">
-                    <div class="panel-heading">
-                        <div>
-                            <p class="section-kicker">Guest Teams</p>
-                            <h2>游客队伍</h2>
-                        </div>
-                    </div>
-
-                    <form id="guestTeamForm" class="guest-team-form">
-                        <div class="field-stack">
-                            <label for="guestTeamNamesInput">队伍名称</label>
-                            <textarea id="guestTeamNamesInput" rows="7" placeholder="每行一个队伍名&#10;例如：闪电队&#10;勇者队"></textarea>
-                        </div>
-                        <button class="button secondary-button wide-button" type="submit">应用游客队伍</button>
-                    </form>
-                </section>
-
-                <section class="panel class-panel">
-                    <div class="panel-heading">
-                        <div>
-                            <p class="section-kicker">Classes</p>
-                            <h2>我的班级</h2>
-                        </div>
-                        <span id="classCount" class="count-pill">0</span>
-                    </div>
-
-                    <form id="classForm" class="inline-form">
-                        <input id="classNameInput" type="text" maxlength="40" placeholder="例如：中华班" required>
-                        <button class="button primary-button square-button" type="submit">+</button>
-                    </form>
-
-                    <div id="classList" class="list-stack"></div>
-                </section>
-
-                <section class="panel group-panel">
-                    <div class="panel-heading">
-                        <div>
-                            <p class="section-kicker">Groups</p>
-                            <h2>班级小组</h2>
-                        </div>
-                    </div>
-
-                    <form id="groupForm" class="inline-form">
-                        <input id="groupNameInput" type="text" maxlength="40" placeholder="例如：第一组" required>
-                        <button class="button primary-button square-button" type="submit">+</button>
-                    </form>
-
-                    <div id="groupList" class="list-stack"></div>
-                </section>
-
-                <section class="panel danger-panel">
-                    <div class="panel-heading">
-                        <div>
-                            <p class="section-kicker">Danger Zone</p>
-                            <h2>危险操作</h2>
-                        </div>
-                    </div>
-                    <p class="account-note">清空历史总分会把当前班级所有小组积分归零。这个操作适合学期重置或重新开始长期统计。</p>
-                    <button id="clearPointsBtn" class="button danger-button wide-button" type="button">清空当前班级历史总分</button>
-                </section>
+                        <p class="account-note">清空历史总分会把当前班级所有小组积分归零。这个操作适合学期重置或重新开始长期统计。</p>
+                        <button id="clearPointsBtn" class="button danger-button wide-button" type="button">清空当前班级历史总分</button>
+                    </section>
+                </div>
             </div>
         </div>
     </div>

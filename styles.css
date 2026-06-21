@@ -221,7 +221,7 @@ h2 {
 
 .settings-panel-page {
     height: 100%;
-    max-width: 1180px;
+    max-width: 1280px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -246,47 +246,37 @@ h2 {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: 320px minmax(260px, 1fr) minmax(280px, 1fr);
-    grid-template-rows: max-content max-content max-content;
-    grid-template-areas:
-        "account guest classes"
-        "groups groups classes"
-        "danger danger danger";
-    align-content: start;
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    align-items: start;
     gap: 14px;
     padding: 14px;
     overflow: auto;
 }
 
+.settings-column {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+}
+
+.settings-management-row {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.92fr) minmax(340px, 1.08fr);
+    gap: 14px;
+    align-items: start;
+    min-width: 0;
+}
+
 .settings-grid .panel {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     overflow: visible;
-}
-
-.backend-panel {
-    grid-area: account;
-}
-
-.guest-panel {
-    grid-area: guest;
-}
-
-.class-panel {
-    grid-area: classes;
-}
-
-.group-panel {
-    grid-area: groups;
-}
-
-.danger-panel {
-    grid-area: danger;
 }
 
 .class-panel .list-stack,
 .group-panel .list-stack {
-    max-height: min(48vh, 460px);
+    max-height: min(52vh, 520px);
 }
 
 .panel-heading {
@@ -344,6 +334,44 @@ textarea:focus {
     padding-top: 10px;
     margin-top: 12px;
     border-top: 1px solid var(--border);
+}
+
+.auth-mode-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 10px 0 8px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(148, 163, 184, 0.1);
+}
+
+.auth-mode-button {
+    min-height: 38px;
+    border: 0;
+    border-radius: 6px;
+    color: var(--muted);
+    background: transparent;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.auth-mode-button.is-active {
+    color: #ffffff;
+    background: var(--primary);
+    box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+}
+
+.auth-mode-button:disabled {
+    opacity: 0.56;
+}
+
+.auth-hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
 }
 
 .account-note {
@@ -949,13 +977,11 @@ textarea:focus {
 
     .settings-grid {
         grid-template-columns: 1fr;
-        grid-template-areas:
-            "account"
-            "guest"
-            "classes"
-            "groups"
-            "danger";
         overflow: auto;
+    }
+
+    .settings-management-row {
+        grid-template-columns: 1fr;
     }
 }
 

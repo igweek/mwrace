@@ -24,7 +24,8 @@
         bonusPoints: 0,
         lastActiveGroupId: null,
         configLoaded: false,
-        guestTeamNames: []
+        guestTeamNames: [],
+        authMode: "login"
     };
 
     let supabaseImportPromise = null;
@@ -41,10 +42,12 @@
         closeSettingsBtn: $("#closeSettingsBtn"),
         settingsOverlay: $("#settingsOverlay"),
         classSelect: $("#classSelect"),
+        authLoginModeBtn: $("#authLoginModeBtn"),
+        authRegisterModeBtn: $("#authRegisterModeBtn"),
+        authModeHint: $("#authModeHint"),
         authEmail: $("#authEmail"),
         authPassword: $("#authPassword"),
-        signInBtn: $("#signInBtn"),
-        signUpBtn: $("#signUpBtn"),
+        authSubmitBtn: $("#authSubmitBtn"),
         signOutBtn: $("#signOutBtn"),
         classForm: $("#classForm"),
         classNameInput: $("#classNameInput"),
@@ -104,8 +107,10 @@
             if (event.target === els.settingsOverlay) closeSettings();
         });
         els.classSelect.addEventListener("change", () => selectClass(els.classSelect.value));
-        els.signInBtn.addEventListener("click", signIn);
-        els.signUpBtn.addEventListener("click", signUp);
+        els.authLoginModeBtn.addEventListener("click", () => setAuthMode("login"));
+        els.authRegisterModeBtn.addEventListener("click", () => setAuthMode("register"));
+        els.authSubmitBtn.addEventListener("click", submitAuthForm);
+        els.authEmail.addEventListener("input", clearAuthPassword);
         els.signOutBtn.addEventListener("click", signOut);
         els.classForm.addEventListener("submit", createClassFromForm);
         els.guestTeamForm.addEventListener("submit", applyGuestTeamSettings);
@@ -175,6 +180,7 @@
             const listenerResult = state.client.auth.onAuthStateChange((_event, session) => {
                 state.session = session;
                 state.user = session ? session.user : null;
+                clearAuthPassword();
                 loadData();
             });
             state.authListener = listenerResult.data.subscription;
@@ -186,6 +192,41 @@
         }
     }
 
+    function setAuthMode(mode) {
+        state.authMode = mode === "register" ? "register" : "login";
+        clearAuthPassword();
+        updateAuthModeView();
+    }
+
+    function submitAuthForm() {
+        if (state.authMode === "register") {
+            signUp();
+            return;
+        }
+        signIn();
+    }
+
+    function clearAuthPassword() {
+        if (els.authPassword) els.authPassword.value = "";
+    }
+
+    function updateAuthModeView() {
+        const isRegister = state.authMode === "register";
+        const signedIn = isSignedIn();
+        els.authLoginModeBtn.classList.toggle("is-active", !isRegister);
+        els.authRegisterModeBtn.classList.toggle("is-active", isRegister);
+        els.authLoginModeBtn.setAttribute("aria-selected", String(!isRegister));
+        els.authRegisterModeBtn.setAttribute("aria-selected", String(isRegister));
+        els.authPassword.setAttribute("autocomplete", isRegister ? "new-password" : "current-password");
+        els.authSubmitBtn.textContent = isRegister ? "注册账号" : "登录";
+        els.authSubmitBtn.classList.toggle("secondary-button", isRegister);
+        els.authSubmitBtn.classList.toggle("primary-button", !isRegister);
+        let hint = "使用已有邮箱登录，继续管理你的班级和历史总分。";
+        if (isRegister) hint = "注册新邮箱前请先退出当前账号；已注册邮箱请直接切回登录。";
+        if (signedIn) hint = "当前账号已登录；切换账号或注册新账号前，请先退出。";
+        els.authModeHint.textContent = hint;
+    }
+
     function unsubscribeAuthListener() {
         if (state.authListener && state.authListener.unsubscribe) {
             state.authListener.unsubscribe();
@@ -195,7 +236,7 @@
 
     async function signIn() {
         if (!ensureCloudReady()) return;
-        const email = els.authEmail.value.trim();
+        const email = normalizeEmail(els.authEmail.value);
         const password = els.authPassword.value;
         if (!email || !password) {
             toast("请填写邮箱和密码。", "error");
@@ -203,6 +244,7 @@
         }
 
         const { error } = await state.client.auth.signInWithPassword({ email, password });
+        clearAuthPassword();
         if (error) {
             toast(`登录失败：${friendlyError(error)}`, "error");
             return;
@@ -211,27 +253,66 @@
     }
 
     async function signUp() {
-        if (!ensureCloudReady()) return;
-        const email = els.authEmail.value.trim();
+        if (!ensureCloudReady()) {
+            clearAuthPassword();
+            return;
+        }
+        if (isSignedIn()) {
+            clearAuthPassword();
+            toast("注册新账号前，请先退出当前账号。", "error");
+            return;
+        }
+
+        const email = normalizeEmail(els.authEmail.value);
         const password = els.authPassword.value;
         if (!email || !password) {
+            clearAuthPassword();
             toast("请填写邮箱和密码。", "error");
             return;
         }
         if (password.length < 6) {
+            clearAuthPassword();
             toast("密码至少需要 6 位。", "error");
             return;
         }
 
-        const { error } = await state.client.auth.signUp({ email, password });
+        const { data, error } = await state.client.auth.signUp({ email, password });
+        clearAuthPassword();
         if (error) {
+            if (isDuplicateEmailError(error)) {
+                setAuthMode("login");
+                els.authEmail.value = email;
+                toast("这个邮箱已经注册过，请直接登录。", "error");
+                return;
+            }
             toast(`注册失败：${friendlyError(error)}`, "error");
             return;
         }
+
+        if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+            setAuthMode("login");
+            els.authEmail.value = email;
+            toast("这个邮箱已经注册过，请直接登录。", "error");
+            return;
+        }
+
         toast("注册成功。如项目开启邮箱验证，请先完成验证后登录。");
     }
 
+    function normalizeEmail(value) {
+        return String(value || "").trim().toLowerCase();
+    }
+
+    function isDuplicateEmailError(error) {
+        const message = `${error && error.message ? error.message : ""} ${error && error.code ? error.code : ""}`.toLowerCase();
+        return message.includes("already registered")
+            || message.includes("already been registered")
+            || message.includes("user already")
+            || message.includes("email_exists");
+    }
+
     async function signOut() {
+        clearAuthPassword();
         if (!state.client) return;
         const { error } = await state.client.auth.signOut();
         if (error) {
@@ -477,6 +558,7 @@
         renderTrack();
         renderScoreboard();
         updateControlAvailability();
+        updateAuthModeView();
     }
 
     function updateControlAvailability() {
@@ -490,17 +572,21 @@
         els.restartRaceBtn.disabled = state.groups.length === 0;
         els.clearPointsBtn.disabled = state.groups.length === 0;
         els.stepsInput.disabled = false;
-        els.signInBtn.disabled = !state.client;
-        els.signUpBtn.disabled = !state.client;
+        els.authLoginModeBtn.disabled = false;
+        els.authRegisterModeBtn.disabled = false;
+        els.authSubmitBtn.disabled = !state.client || signedIn;
         els.signOutBtn.disabled = !isSignedIn();
     }
 
     function openSettings() {
+        clearAuthPassword();
+        updateAuthModeView();
         els.settingsOverlay.classList.add("is-visible");
         els.settingsOverlay.setAttribute("aria-hidden", "false");
     }
 
     function closeSettings() {
+        clearAuthPassword();
         els.settingsOverlay.classList.remove("is-visible");
         els.settingsOverlay.setAttribute("aria-hidden", "true");
     }
