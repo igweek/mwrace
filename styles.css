@@ -246,37 +246,72 @@ h2 {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-    align-items: start;
-    gap: 14px;
-    padding: 14px;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
     overflow: auto;
 }
 
-.settings-column {
+.settings-nav {
     display: grid;
-    gap: 14px;
-    min-width: 0;
+    align-content: start;
+    gap: 6px;
+    min-height: 0;
+    padding: 12px;
+    border-right: 1px solid var(--border);
+    background: rgba(148, 163, 184, 0.06);
 }
 
-.settings-management-row {
+.settings-nav-item {
     display: grid;
-    grid-template-columns: minmax(280px, 0.92fr) minmax(340px, 1.08fr);
-    gap: 14px;
-    align-items: start;
-    min-width: 0;
+    gap: 2px;
+    width: 100%;
+    min-height: 54px;
+    padding: 9px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text);
+    background: transparent;
+    text-align: left;
 }
 
-.settings-grid .panel {
+.settings-nav-item span {
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.settings-nav-item small {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.settings-nav-item.is-active {
+    border-color: rgba(15, 118, 110, 0.26);
+    background: rgba(15, 118, 110, 0.1);
+}
+
+.settings-content {
+    min-height: 0;
+    min-width: 0;
+    padding: 16px;
+    overflow: auto;
+}
+
+.settings-section {
+    display: none;
+    max-width: 720px;
+}
+
+.settings-section.is-active {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    overflow: visible;
 }
 
 .class-panel .list-stack,
 .group-panel .list-stack {
-    max-height: min(52vh, 520px);
+    max-height: min(58vh, 560px);
 }
 
 .panel-heading {
@@ -980,8 +1015,20 @@ textarea:focus {
         overflow: auto;
     }
 
-    .settings-management-row {
-        grid-template-columns: 1fr;
+    .settings-nav {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(116px, max-content);
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .settings-content {
+        padding: 12px;
+    }
+
+    .settings-section {
+        max-width: none;
     }
 }
 
@@ -1619,7 +1666,25 @@ textarea:focus,
     background-size: 42px 42px;
 }
 
-.settings-grid .panel {
+.settings-nav {
+    border-right-color: rgba(148, 163, 184, 0.18);
+    background: rgba(5, 10, 18, 0.46);
+}
+
+.settings-nav-item {
+    color: #e7edf6;
+}
+
+.settings-nav-item:hover {
+    background: rgba(255, 255, 255, 0.055);
+}
+
+.settings-nav-item.is-active {
+    border-color: rgba(25, 211, 197, 0.42);
+    background: rgba(25, 211, 197, 0.12);
+}
+
+.settings-section {
     background: linear-gradient(180deg, rgba(17, 25, 36, 0.96), rgba(10, 15, 23, 0.96));
 }
 
@@ -1925,7 +1990,25 @@ body.theme-light .settings-overlay {
     background: rgba(225, 235, 242, 0.76);
 }
 
-body.theme-light .settings-grid .panel {
+body.theme-light .settings-nav {
+    border-right-color: rgba(81, 108, 129, 0.16);
+    background: rgba(226, 239, 246, 0.42);
+}
+
+body.theme-light .settings-nav-item {
+    color: #122033;
+}
+
+body.theme-light .settings-nav-item:hover {
+    background: rgba(10, 159, 151, 0.06);
+}
+
+body.theme-light .settings-nav-item.is-active {
+    border-color: rgba(10, 159, 151, 0.3);
+    background: rgba(10, 159, 151, 0.1);
+}
+
+body.theme-light .settings-section {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(239, 247, 251, 0.97));
 }
 

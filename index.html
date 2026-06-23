@@ -112,8 +112,31 @@
             </div>
 
             <div class="settings-grid">
-                <div class="settings-column settings-side-column">
-                    <section class="panel backend-panel">
+                <nav class="settings-nav" aria-label="设置分类">
+                    <button class="settings-nav-item is-active" type="button" data-settings-section="account">
+                        <span>账号</span>
+                        <small>登录与注册</small>
+                    </button>
+                    <button class="settings-nav-item" type="button" data-settings-section="classes">
+                        <span>班级</span>
+                        <small>创建与切换</small>
+                    </button>
+                    <button class="settings-nav-item" type="button" data-settings-section="groups">
+                        <span>小组</span>
+                        <small>成员队伍</small>
+                    </button>
+                    <button class="settings-nav-item" type="button" data-settings-section="guest">
+                        <span>游客模式</span>
+                        <small>临时队伍</small>
+                    </button>
+                    <button class="settings-nav-item" type="button" data-settings-section="data">
+                        <span>数据</span>
+                        <small>历史总分</small>
+                    </button>
+                </nav>
+
+                <div class="settings-content">
+                    <section class="panel settings-section backend-panel is-active" data-settings-panel="account">
                         <div class="panel-heading">
                             <div>
                                 <p class="section-kicker">Account</p>
@@ -146,7 +169,40 @@
                         </div>
                     </section>
 
-                    <section class="panel guest-panel">
+                    <section class="panel settings-section class-panel" data-settings-panel="classes">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-kicker">Classes</p>
+                                <h2>班级</h2>
+                            </div>
+                            <span id="classCount" class="count-pill">0</span>
+                        </div>
+
+                        <form id="classForm" class="inline-form">
+                            <input id="classNameInput" type="text" maxlength="40" placeholder="例如：中华班" required>
+                            <button class="button primary-button square-button" type="submit">+</button>
+                        </form>
+
+                        <div id="classList" class="list-stack"></div>
+                    </section>
+
+                    <section class="panel settings-section group-panel" data-settings-panel="groups">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-kicker">Groups</p>
+                                <h2>小组</h2>
+                            </div>
+                        </div>
+
+                        <form id="groupForm" class="inline-form">
+                            <input id="groupNameInput" type="text" maxlength="40" placeholder="例如：第一组" required>
+                            <button class="button primary-button square-button" type="submit">+</button>
+                        </form>
+
+                        <div id="groupList" class="list-stack"></div>
+                    </section>
+
+                    <section class="panel settings-section guest-panel" data-settings-panel="guest">
                         <div class="panel-heading">
                             <div>
                                 <p class="section-kicker">Guest Teams</p>
@@ -162,45 +218,8 @@
                             <button class="button secondary-button wide-button" type="submit">应用游客队伍</button>
                         </form>
                     </section>
-                </div>
 
-                <div class="settings-column settings-main-column">
-                    <div class="settings-management-row">
-                        <section class="panel class-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="section-kicker">Classes</p>
-                                    <h2>班级</h2>
-                                </div>
-                                <span id="classCount" class="count-pill">0</span>
-                            </div>
-
-                            <form id="classForm" class="inline-form">
-                                <input id="classNameInput" type="text" maxlength="40" placeholder="例如：中华班" required>
-                                <button class="button primary-button square-button" type="submit">+</button>
-                            </form>
-
-                            <div id="classList" class="list-stack"></div>
-                        </section>
-
-                        <section class="panel group-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="section-kicker">Groups</p>
-                                    <h2>小组</h2>
-                                </div>
-                            </div>
-
-                            <form id="groupForm" class="inline-form">
-                                <input id="groupNameInput" type="text" maxlength="40" placeholder="例如：第一组" required>
-                                <button class="button primary-button square-button" type="submit">+</button>
-                            </form>
-
-                            <div id="groupList" class="list-stack"></div>
-                        </section>
-                    </div>
-
-                    <section class="panel danger-panel">
+                    <section class="panel settings-section danger-panel" data-settings-panel="data">
                         <div class="panel-heading">
                             <div>
                                 <p class="section-kicker">Data</p>

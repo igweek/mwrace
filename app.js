@@ -25,7 +25,8 @@
         lastActiveGroupId: null,
         configLoaded: false,
         guestTeamNames: [],
-        authMode: "login"
+        authMode: "login",
+        settingsSection: "account"
     };
 
     let supabaseImportPromise = null;
@@ -41,6 +42,8 @@
         openSettingsBtn: $("#openSettingsBtn"),
         closeSettingsBtn: $("#closeSettingsBtn"),
         settingsOverlay: $("#settingsOverlay"),
+        settingsNavButtons: document.querySelectorAll("[data-settings-section]"),
+        settingsPanels: document.querySelectorAll("[data-settings-panel]"),
         classSelect: $("#classSelect"),
         authLoginModeBtn: $("#authLoginModeBtn"),
         authRegisterModeBtn: $("#authRegisterModeBtn"),
@@ -105,6 +108,9 @@
         els.closeSettingsBtn.addEventListener("click", closeSettings);
         els.settingsOverlay.addEventListener("click", (event) => {
             if (event.target === els.settingsOverlay) closeSettings();
+        });
+        els.settingsNavButtons.forEach((button) => {
+            button.addEventListener("click", () => setSettingsSection(button.dataset.settingsSection));
         });
         els.classSelect.addEventListener("change", () => selectClass(els.classSelect.value));
         els.authLoginModeBtn.addEventListener("click", () => setAuthMode("login"));
@@ -559,6 +565,7 @@
         renderScoreboard();
         updateControlAvailability();
         updateAuthModeView();
+        setSettingsSection(state.settingsSection);
     }
 
     function updateControlAvailability() {
@@ -581,6 +588,7 @@
     function openSettings() {
         clearAuthPassword();
         updateAuthModeView();
+        setSettingsSection(state.settingsSection);
         els.settingsOverlay.classList.add("is-visible");
         els.settingsOverlay.setAttribute("aria-hidden", "false");
     }
@@ -589,6 +597,21 @@
         clearAuthPassword();
         els.settingsOverlay.classList.remove("is-visible");
         els.settingsOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    function setSettingsSection(section) {
+        const nextSection = [...els.settingsPanels].some((panel) => panel.dataset.settingsPanel === section)
+            ? section
+            : "account";
+        state.settingsSection = nextSection;
+        els.settingsNavButtons.forEach((button) => {
+            const active = button.dataset.settingsSection === nextSection;
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-current", active ? "page" : "false");
+        });
+        els.settingsPanels.forEach((panel) => {
+            panel.classList.toggle("is-active", panel.dataset.settingsPanel === nextSection);
+        });
     }
 
     function renderClassSelect() {
