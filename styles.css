@@ -38,6 +38,10 @@ body {
     overflow: hidden;
 }
 
+.is-hidden {
+    display: none !important;
+}
+
 button,
 input,
 select,

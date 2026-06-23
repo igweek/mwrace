@@ -594,11 +594,14 @@
         const signedIn = isSignedIn();
         els.accountSessionCard.hidden = !signedIn;
         els.accountAuthPanel.hidden = signedIn;
+        els.accountSessionCard.classList.toggle("is-hidden", !signedIn);
+        els.accountAuthPanel.classList.toggle("is-hidden", signedIn);
         els.accountEmailText.textContent = signedIn ? (state.user.email || "已登录") : "";
     }
 
     function openSettings() {
         clearAuthPassword();
+        updateAccountPanel();
         updateAuthModeView();
         setSettingsSection(state.settingsSection);
         els.settingsOverlay.classList.add("is-visible");
