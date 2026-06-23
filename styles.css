@@ -300,7 +300,7 @@ h2 {
 
 .settings-section {
     display: none;
-    max-width: 720px;
+    max-width: 980px;
 }
 
 .settings-section.is-active {
@@ -309,9 +309,61 @@ h2 {
     min-width: 0;
 }
 
+.backend-panel,
+.guest-panel {
+    max-width: 720px;
+}
+
+.settings-editor-grid {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.78fr) minmax(320px, 1.22fr);
+    gap: 14px;
+    min-width: 0;
+}
+
+.settings-list-pane,
+.settings-edit-pane {
+    min-width: 0;
+}
+
 .class-panel .list-stack,
-.group-panel .list-stack {
+.settings-edit-pane .list-stack {
     max-height: min(58vh, 560px);
+}
+
+.settings-data-box,
+.account-session {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(148, 163, 184, 0.08);
+}
+
+.settings-data-box div,
+.account-session div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.settings-data-box strong,
+.account-session strong {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-data-box span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
 }
 
 .panel-heading {
@@ -1029,6 +1081,10 @@ textarea:focus {
 
     .settings-section {
         max-width: none;
+    }
+
+    .settings-editor-grid {
+        grid-template-columns: 1fr;
     }
 }
 

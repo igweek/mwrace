@@ -45,6 +45,9 @@
         settingsNavButtons: document.querySelectorAll("[data-settings-section]"),
         settingsPanels: document.querySelectorAll("[data-settings-panel]"),
         classSelect: $("#classSelect"),
+        accountSessionCard: $("#accountSessionCard"),
+        accountAuthPanel: $("#accountAuthPanel"),
+        accountEmailText: $("#accountEmailText"),
         authLoginModeBtn: $("#authLoginModeBtn"),
         authRegisterModeBtn: $("#authRegisterModeBtn"),
         authModeHint: $("#authModeHint"),
@@ -56,6 +59,7 @@
         classNameInput: $("#classNameInput"),
         classList: $("#classList"),
         classCount: $("#classCount"),
+        selectedClassEditorTitle: $("#selectedClassEditorTitle"),
         guestTeamForm: $("#guestTeamForm"),
         guestTeamNamesInput: $("#guestTeamNamesInput"),
         selectedClassTitle: $("#selectedClassTitle"),
@@ -564,6 +568,7 @@
         renderTrack();
         renderScoreboard();
         updateControlAvailability();
+        updateAccountPanel();
         updateAuthModeView();
         setSettingsSection(state.settingsSection);
     }
@@ -583,6 +588,13 @@
         els.authRegisterModeBtn.disabled = false;
         els.authSubmitBtn.disabled = !state.client || signedIn;
         els.signOutBtn.disabled = !isSignedIn();
+    }
+
+    function updateAccountPanel() {
+        const signedIn = isSignedIn();
+        els.accountSessionCard.hidden = !signedIn;
+        els.accountAuthPanel.hidden = signedIn;
+        els.accountEmailText.textContent = signedIn ? (state.user.email || "已登录") : "";
     }
 
     function openSettings() {
@@ -689,6 +701,10 @@
 
     function renderGroupList() {
         els.groupList.innerHTML = "";
+        const selectedClass = state.classes.find((item) => item.id === state.selectedClassId);
+        if (els.selectedClassEditorTitle) {
+            els.selectedClassEditorTitle.textContent = selectedClass && selectedClass.id !== GUEST_CLASS_ID ? selectedClass.name : "选择班级";
+        }
 
         if (!isSignedIn()) {
             els.groupList.appendChild(emptyListMessage("游客模式可比赛，登录后可保存班级小组"));

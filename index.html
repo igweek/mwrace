@@ -118,20 +118,12 @@
                         <small>登录与注册</small>
                     </button>
                     <button class="settings-nav-item" type="button" data-settings-section="classes">
-                        <span>班级</span>
-                        <small>创建与切换</small>
-                    </button>
-                    <button class="settings-nav-item" type="button" data-settings-section="groups">
-                        <span>小组</span>
-                        <small>成员队伍</small>
+                        <span>班级管理</span>
+                        <small>班级、小组、积分</small>
                     </button>
                     <button class="settings-nav-item" type="button" data-settings-section="guest">
                         <span>游客模式</span>
                         <small>临时队伍</small>
-                    </button>
-                    <button class="settings-nav-item" type="button" data-settings-section="data">
-                        <span>数据</span>
-                        <small>历史总分</small>
                     </button>
                 </nav>
 
@@ -145,61 +137,80 @@
                             <span id="accountState" class="mini-state">游客模式</span>
                         </div>
 
-                        <p class="account-note">未登录也可以直接比赛；登录后才会保存班级、小组和历史总分。</p>
-
-                        <div class="auth-mode-tabs" role="tablist" aria-label="账号操作">
-                            <button id="authLoginModeBtn" class="auth-mode-button is-active" type="button" role="tab" aria-selected="true">登录</button>
-                            <button id="authRegisterModeBtn" class="auth-mode-button" type="button" role="tab" aria-selected="false">注册</button>
+                        <div id="accountSessionCard" class="account-session" hidden>
+                            <div>
+                                <span class="entity-meta">当前账号</span>
+                                <strong id="accountEmailText">已登录</strong>
+                            </div>
+                            <button id="signOutBtn" class="button ghost-button" type="button">退出登录</button>
                         </div>
-                        <p id="authModeHint" class="auth-hint">使用已有邮箱登录，继续管理你的班级和历史总分。</p>
 
-                        <div class="auth-grid">
-                            <div class="field-stack">
-                                <label for="authEmail">邮箱</label>
-                                <input id="authEmail" type="email" placeholder="teacher@example.com" autocomplete="username" spellcheck="false">
+                        <div id="accountAuthPanel">
+                            <p class="account-note">未登录也可以直接比赛；登录后才会保存班级、小组和历史总分。</p>
+
+                            <div class="auth-mode-tabs" role="tablist" aria-label="账号操作">
+                                <button id="authLoginModeBtn" class="auth-mode-button is-active" type="button" role="tab" aria-selected="true">登录</button>
+                                <button id="authRegisterModeBtn" class="auth-mode-button" type="button" role="tab" aria-selected="false">注册</button>
                             </div>
-                            <div class="field-stack">
-                                <label for="authPassword">密码</label>
-                                <input id="authPassword" type="password" placeholder="不少于 6 位" autocomplete="current-password">
+                            <p id="authModeHint" class="auth-hint">使用已有邮箱登录，继续管理你的班级和历史总分。</p>
+
+                            <div class="auth-grid">
+                                <div class="field-stack">
+                                    <label for="authEmail">邮箱</label>
+                                    <input id="authEmail" type="email" placeholder="teacher@example.com" autocomplete="username" spellcheck="false">
+                                </div>
+                                <div class="field-stack">
+                                    <label for="authPassword">密码</label>
+                                    <input id="authPassword" type="password" placeholder="不少于 6 位" autocomplete="current-password">
+                                </div>
+                                <button id="authSubmitBtn" class="button primary-button wide-button" type="button">登录</button>
                             </div>
-                            <div class="button-row">
-                                <button id="authSubmitBtn" class="button primary-button" type="button">登录</button>
-                                <button id="signOutBtn" class="button ghost-button" type="button">退出</button>
-                            </div>
-                        </div>
+                        </div> 
                     </section>
 
                     <section class="panel settings-section class-panel" data-settings-panel="classes">
-                        <div class="panel-heading">
-                            <div>
-                                <p class="section-kicker">Classes</p>
-                                <h2>班级</h2>
+                        <div class="settings-editor-grid">
+                            <div class="settings-list-pane">
+                                <div class="panel-heading">
+                                    <div>
+                                        <p class="section-kicker">Classes</p>
+                                        <h2>班级</h2>
+                                    </div>
+                                    <span id="classCount" class="count-pill">0</span>
+                                </div>
+
+                                <form id="classForm" class="inline-form">
+                                    <input id="classNameInput" type="text" maxlength="40" placeholder="例如：中华班" required>
+                                    <button class="button primary-button square-button" type="submit">+</button>
+                                </form>
+
+                                <div id="classList" class="list-stack"></div>
                             </div>
-                            <span id="classCount" class="count-pill">0</span>
-                        </div>
 
-                        <form id="classForm" class="inline-form">
-                            <input id="classNameInput" type="text" maxlength="40" placeholder="例如：中华班" required>
-                            <button class="button primary-button square-button" type="submit">+</button>
-                        </form>
+                            <div class="settings-edit-pane">
+                                <div class="panel-heading">
+                                    <div>
+                                        <p class="section-kicker">Edit</p>
+                                        <h2 id="selectedClassEditorTitle">选择班级</h2>
+                                    </div>
+                                </div>
 
-                        <div id="classList" class="list-stack"></div>
-                    </section>
+                                <form id="groupForm" class="inline-form">
+                                    <input id="groupNameInput" type="text" maxlength="40" placeholder="例如：第一组" required>
+                                    <button class="button primary-button square-button" type="submit">+</button>
+                                </form>
 
-                    <section class="panel settings-section group-panel" data-settings-panel="groups">
-                        <div class="panel-heading">
-                            <div>
-                                <p class="section-kicker">Groups</p>
-                                <h2>小组</h2>
+                                <div id="groupList" class="list-stack"></div>
+
+                                <div class="settings-data-box">
+                                    <div>
+                                        <strong>历史总分</strong>
+                                        <span>清空当前班级所有小组的历史总分。</span>
+                                    </div>
+                                    <button id="clearPointsBtn" class="button danger-button" type="button">清空</button>
+                                </div>
                             </div>
                         </div>
-
-                        <form id="groupForm" class="inline-form">
-                            <input id="groupNameInput" type="text" maxlength="40" placeholder="例如：第一组" required>
-                            <button class="button primary-button square-button" type="submit">+</button>
-                        </form>
-
-                        <div id="groupList" class="list-stack"></div>
                     </section>
 
                     <section class="panel settings-section guest-panel" data-settings-panel="guest">
@@ -219,16 +230,6 @@
                         </form>
                     </section>
 
-                    <section class="panel settings-section danger-panel" data-settings-panel="data">
-                        <div class="panel-heading">
-                            <div>
-                                <p class="section-kicker">Data</p>
-                                <h2>数据操作</h2>
-                            </div>
-                        </div>
-                        <p class="account-note">清空历史总分会把当前班级所有小组积分归零。这个操作适合学期重置或重新开始长期统计。</p>
-                        <button id="clearPointsBtn" class="button danger-button wide-button" type="button">清空当前班级历史总分</button>
-                    </section>
                 </div>
             </div>
         </div>
